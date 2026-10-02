@@ -19,6 +19,10 @@ rpg/
 │   ├── rpg-memorias.md         # Agente: atualiza memórias individuais dos personagens
 │   └── rpg-estado.md           # Agente: atualiza o estado presente de cada personagem
 │
+├── ferramentas/                # Utilitários opcionais da mesa
+│   ├── rolar.ps1               # Rolador de pool de d10 (V5) — opcional
+│   └── README.md               # Uso do rolador
+│
 ├── mundo/
 │   ├── mundo.md                # Lore geral, cidades, facções, NPCs menores
 │   └── acontecimentos.md       # Log cronológico e objetivo de eventos (com índice)
@@ -377,5 +381,25 @@ Sessão encerrada — todos os arquivos atualizados
 | **Narrador** | Kiro (Claude) em sessão Vibe |
 | **Automação** | Hooks do Kiro (`Stop` e `SessionStart`) |
 | **Agentes** | 3 agentes customizados em `/agentes/` |
+| **Ferramentas** | Rolador de dados opcional (`ferramentas/rolar.ps1`) — ver seção "Ferramentas da Mesa" |
 | **Formato** | Markdown puro para todos os arquivos |
 | **Persistência** | Garantida pelos arquivos — Kiro não tem memória nativa entre sessões |
+
+---
+
+## Ferramentas da Mesa
+
+A pasta `ferramentas/` reúne utilitários **opcionais** que apoiam a mesa sem alterar a narrativa nem os arquivos de memória.
+
+### `rolar.ps1` — Rolador de dados (V5)
+
+Script PowerShell que rola um pool de d10 e conta sucessos pelas regras da 5ª edição (ver `config.md`): 6+ é sucesso, pares de 10 somam +2 (mesclagem crítica), e os Dados de Fome sinalizam Falha de Bestialidade (1) e Êxtase (10). Aceita uma dificuldade opcional e indica se o teste passou.
+
+- **Opcional por design:** o projeto funciona 100% sem ele. O jogador pode sempre rolar seus próprios dados (físicos ou de qualquer app) e informar o resultado ao Narrador. O rolador é uma conveniência — útil para rolagens ocultas do Narrador ou por preferência pessoal. A escolha de usar ou não é sempre do jogador.
+- **Execução portátil (Windows):** rode sempre com bypass por chamada, que vale só para aquela execução e não altera nenhuma configuração da máquina:
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File .\rolar.ps1 -Pool 5 -Nome "Destreza + Atletismo"
+  ```
+  O Narrador **nunca** altera a execution policy da máquina do jogador. Em macOS/Linux, rodar `.ps1` exige PowerShell Core (`pwsh`); sem ele, basta informar as rolagens manualmente.
+- **Não escreve em arquivo nenhum** — apenas imprime o resultado no terminal. Está fora do fluxo dos agentes de memória.
+- **Uso detalhado:** `ferramentas/README.md`. Regras de conduta do Narrador quanto às rolagens: seção "Como as rolagens acontecem" em `config.md`.
