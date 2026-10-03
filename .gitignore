@@ -1,0 +1,41 @@
+# ===========================================================================
+#  .gitignore — Mesa de RPG single-player
+# ---------------------------------------------------------------------------
+#  Objetivo: o repositório carrega apenas o SISTEMA (regras, arquitetura,
+#  agentes, ferramentas) e as FICHAS DE EXEMPLO (Xunda e Jacinto). Tudo o que
+#  é gerado/alterado durante uma campanha real — novas fichas de personagem e
+#  NPC — fica FORA do versionamento. Assim, ao clonar o projeto ou publicar uma
+#  nova versão, nenhuma ficha da campanha de alguém é adicionada ao repositório.
+#
+#  Vale para os dois sistemas (cthulhu/ e vampiro/): os padrões usam */ e
+#  casam ambos.
+#
+#  IMPORTANTE sobre arquivos JÁ versionados (exemplos de Xunda/Jacinto e os
+#  mundo/acontecimentos.md e mundo/mundo.md): o .gitignore NÃO impede o Git de
+#  continuar rastreando um arquivo que já foi commitado. Para que as alterações
+#  que os agentes fazem nesses arquivos de exemplo durante o jogo NÃO apareçam
+#  como mudanças, marque-os localmente com skip-worktree (ver README). O
+#  .gitignore abaixo cuida de tudo que ainda NÃO está versionado.
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+#  Personagens: ignora todas as pastas de personagem, exceto os exemplos
+# ---------------------------------------------------------------------------
+*/personagens/*/
+!*/personagens/xunda/
+
+# ---------------------------------------------------------------------------
+#  NPCs: ignora todas as pastas de NPC, exceto os exemplos
+# ---------------------------------------------------------------------------
+*/npcs/*/
+!*/npcs/jacinto/
+
+# ---------------------------------------------------------------------------
+#  Ruído de sistema operacional / editor
+# ---------------------------------------------------------------------------
+Thumbs.db
+Desktop.ini
+.DS_Store
+*~
+*.tmp
+New folder/

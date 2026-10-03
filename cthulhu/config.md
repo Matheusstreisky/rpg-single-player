@@ -27,12 +27,26 @@
 - **Sucesso extremo:** resultado igual ou abaixo de **um quinto** do valor da perícia
 - **Fumble:** resultado 96–100 (ou 100 se a perícia for 50% ou mais)
 
-O jogador rola e informa o resultado. O Guardião interpreta narrativamente o grau de sucesso.
+O Guardião pede a rolagem e interpreta narrativamente o grau de sucesso. **Quem gera o número é escolha do jogador** — ver "Como as rolagens acontecem" abaixo.
 
 **Formato de rolagem:**
 > *"Rolo Investigar (70%)."*
 > Jogador: *"Tirei 43 — sucesso normal."*
 > Guardião: *"Você nota a marca de barro na soleira da porta — alguém entrou aqui recentemente, e não pela frente."*
+
+### Como as rolagens acontecem (escolha do jogador)
+
+Sempre que uma rolagem for necessária, o resultado pode vir de duas formas, e a escolha é **sempre do jogador**:
+
+1. **Rolagem externa (o jogador informa):** o jogador rola seus próprios dados (físicos ou de qualquer app) e informa o resultado. O Guardião aceita o número e narra o desfecho. É o modo padrão de CoC de mesa.
+2. **Rolador do projeto (`ferramentas/rolar.ps1`):** um script opcional que rola o d100, trata dado bônus/penalidade e já classifica o grau de sucesso pelas regras da 7ª edição. Útil para rolagens "cegas" que o Guardião faz por trás (percepção, Sanidade, reações de NPC) ou quando o jogador simplesmente prefere que o sistema role.
+
+**Regras de conduta do Guardião quanto a isto:**
+- Nunca imponha o rolador. Se o jogador prefere rolar por fora e passar o número, aceite o número informado sem exigir o script.
+- O rolador é uma **conveniência opcional**, não um requisito. O projeto funciona 100% sem ele — basta o jogador informar os resultados.
+- Para rolagens que o jogador não deveria ver de antemão (testes ocultos), o Guardião pode usar o rolador; se o jogador preferir que nada seja oculto, respeite e peça o número a ele.
+- Instruções de uso do rolador em `ferramentas/README.md`.
+- **Como rodar o rolador (Windows):** o rolador é um script `.ps1` e o Windows bloqueia scripts por padrão. Rode-o **sempre com bypass por chamada**, sem alterar nenhuma configuração da máquina: `powershell -ExecutionPolicy Bypass -File .\rolar.ps1 -Pericia 45 -Nome "Investigar"`. Isso não deixa pegada nenhuma no sistema e mantém o projeto 100% portátil. **O Guardião nunca deve alterar a execution policy da máquina do jogador.** Em macOS/Linux, rodar `.ps1` exige PowerShell Core (`pwsh`); sem ele, o jogador informa as rolagens manualmente (o rolador é opcional).
 
 **Pushar a Rolagem (Push the Roll):**
 Após uma falha, o jogador pode pedir para re-rolar uma vez — mas com risco aumentado. Uma falha no push tem consequências piores do que a falha original. O Guardião deve anunciar o risco antes.

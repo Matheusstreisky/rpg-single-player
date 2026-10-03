@@ -26,11 +26,25 @@
 - Dois críticos emparelhados = **mesclagem crítica** (sucesso adicional)
 - **Falha crítica:** metade ou mais dos dados mostram 1, e nenhum sucesso
 
-O jogador rola e informa o resultado. O narrador interpreta o resultado narrativamente.
+O narrador pede a rolagem e interpreta o resultado narrativamente. **Quem gera os dados é escolha do jogador** — ver "Como as rolagens acontecem" abaixo.
 
 **Formato de rolagem:**
 > *"Rolo Destreza + Atletismo (dificuldade 2)."*
 > Jogador: *"Tirei 4 dados, resultados: 3, 7, 9, 1 — 2 sucessos."*
+
+### Como as rolagens acontecem (escolha do jogador)
+
+Sempre que uma rolagem for necessária, o resultado pode vir de duas formas, e a escolha é **sempre do jogador**:
+
+1. **Rolagem externa (o jogador informa):** o jogador rola seus próprios dados (físicos ou de qualquer app) e informa o resultado. O narrador aceita o número de sucessos e narra o desfecho. É o modo padrão de mesa.
+2. **Rolador do projeto (`ferramentas/rolar.ps1`):** um script opcional que rola o pool de d10, conta sucessos, trata pares de 10 (mesclagem crítica) e sinaliza os efeitos dos Dados de Fome (Bestialidade e Êxtase). Útil para rolagens "cegas" que o narrador faz por trás ou quando o jogador simplesmente prefere que o sistema role.
+
+**Regras de conduta do narrador quanto a isto:**
+- Nunca imponha o rolador. Se o jogador prefere rolar por fora e passar os sucessos, aceite sem exigir o script.
+- O rolador é uma **conveniência opcional**, não um requisito. O projeto funciona 100% sem ele — basta o jogador informar os resultados.
+- Para rolagens que o jogador não deveria ver de antemão (testes ocultos), o narrador pode usar o rolador; se o jogador preferir que nada seja oculto, respeite e peça os sucessos a ele.
+- Instruções de uso do rolador em `ferramentas/README.md`.
+- **Como rodar o rolador (Windows):** o rolador é um script `.ps1` e o Windows bloqueia scripts por padrão. Rode-o **sempre com bypass por chamada**, sem alterar nenhuma configuração da máquina: `powershell -ExecutionPolicy Bypass -File .\rolar.ps1 -Pool 5 -Nome "Destreza + Atletismo"`. Isso não deixa pegada nenhuma no sistema e mantém o projeto 100% portátil. **O narrador nunca deve alterar a execution policy da máquina do jogador.** Em macOS/Linux, rodar `.ps1` exige PowerShell Core (`pwsh`); sem ele, o jogador informa as rolagens manualmente (o rolador é opcional).
 
 ### Atributos
 Organizados em três categorias, cada uma com três atributos (pontuação de • a •••••):

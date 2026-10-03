@@ -19,6 +19,10 @@ rpg/
 │   ├── rpg-memorias.md         # Agente: atualiza memórias individuais dos personagens
 │   └── rpg-estado.md           # Agente: atualiza o estado presente de cada personagem
 │
+├── ferramentas/                # Utilitários opcionais da mesa
+│   ├── rolar.ps1               # Rolador de dados d100 (CoC 7e) — opcional
+│   └── README.md               # Uso do rolador
+│
 ├── mundo/
 │   ├── mundo.md                # Lore geral, localidade, facções, NPCs menores
 │   └── acontecimentos.md       # Log cronológico e objetivo de eventos (com índice)
@@ -391,5 +395,25 @@ Sessão encerrada — todos os arquivos atualizados
 | **Guardião** | Kiro (Claude) em sessão Vibe |
 | **Automação** | Hooks do Kiro (`Stop` e `SessionStart`) |
 | **Agentes** | 3 agentes customizados em `/agentes/` |
+| **Ferramentas** | Rolador de dados opcional (`ferramentas/rolar.ps1`) — ver seção "Ferramentas da Mesa" |
 | **Formato** | Markdown puro para todos os arquivos |
 | **Persistência** | Garantida pelos arquivos — Kiro não tem memória nativa entre sessões |
+
+---
+
+## Ferramentas da Mesa
+
+A pasta `ferramentas/` reúne utilitários **opcionais** que apoiam a mesa sem alterar a narrativa nem os arquivos de memória.
+
+### `rolar.ps1` — Rolador de dados (CoC 7ª Edição)
+
+Script PowerShell que rola d100, trata dado bônus/penalidade e classifica o grau de sucesso pelas regras da 7ª edição (ver `config.md`). Também faz rolagens genéricas (`NdX+M`, `NdX*M`) para dano, características e tabelas.
+
+- **Opcional por design:** o projeto funciona 100% sem ele. O jogador pode sempre rolar seus próprios dados (físicos ou de qualquer app) e informar o resultado ao Guardião. O rolador é uma conveniência — útil para rolagens ocultas do Guardião (percepção, Sanidade, reações de NPC) ou por preferência pessoal. A escolha de usar ou não é sempre do jogador.
+- **Execução portátil (Windows):** rode sempre com bypass por chamada, que vale só para aquela execução e não altera nenhuma configuração da máquina:
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File .\rolar.ps1 -Pericia 45 -Nome "Investigar"
+  ```
+  O Guardião **nunca** altera a execution policy da máquina do jogador. Em macOS/Linux, rodar `.ps1` exige PowerShell Core (`pwsh`); sem ele, basta informar as rolagens manualmente.
+- **Não escreve em arquivo nenhum** — apenas imprime o resultado no terminal. Está fora do fluxo dos agentes de memória.
+- **Uso detalhado:** `ferramentas/README.md`. Regras de conduta do Guardião quanto às rolagens: seção "Como as rolagens acontecem" em `config.md`.
