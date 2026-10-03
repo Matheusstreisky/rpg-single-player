@@ -219,34 +219,37 @@ Começa vazio, com apenas o cabeçalho:
 
 ---
 
-## Passo 4 — Configure os hooks dos agentes
+## Passo 4 — Configure o hook de fim de sessão
 
-Os agentes já estão definidos nos arquivos em `/agentes/`. O que você precisa fazer é criar os **hooks** no Kiro para que eles sejam acionados automaticamente ao fim de cada turno.
+Os agentes estão definidos nos arquivos em `/agentes/`. O sistema usa um único hook que os lê e combina ao fim de cada sessão — nada dispara entre os turnos.
 
 ### O que são os hooks
 
-Hooks são automações do Kiro que disparam em eventos específicos. Neste sistema, os três agentes usam o trigger `Stop` — ou seja, rodam automaticamente quando o Guardião encerra uma resposta.
+Hooks são automações do Kiro que disparam em eventos específicos. Neste sistema, o hook `rpg-fim-de-sessao` usa o trigger `UserPromptSubmit` com uma frase-gatilho: ele só dispara quando o jogador sinaliza o fim de sessão.
 
-### Como criar os hooks
+### Como funciona
 
-Abra a paleta de comandos (`Ctrl+Shift+P`) e busque **"Open Kiro Hook UI"**. Crie um hook para cada agente:
+O hook está em `.kiro/hooks/rpg-fim-de-sessao.json`. Quando detecta a frase-gatilho no início de uma mensagem, executa `ferramentas/fim-de-sessao.ps1`, que lê os 3 arquivos de agentes e injeta as instruções combinadas no contexto do Kiro. O Kiro executa os 3 passos em ordem e grava tudo de uma vez.
 
-| Hook | Trigger | Ação | Agente |
+| Hook | Trigger | Frase-gatilho | Script |
 |---|---|---|---|
-| `rpg-acontecimentos` | `Stop` | agent | Prompt do arquivo `agentes/rpg-acontecimentos.md` |
-| `rpg-memorias` | `Stop` | agent | Prompt do arquivo `agentes/rpg-memorias.md` |
-| `rpg-estado` | `Stop` | agent | Prompt do arquivo `agentes/rpg-estado.md` |
+| `rpg-fim-de-sessao` | `UserPromptSubmit` | "fim de sessão" e variações | `ferramentas/fim-de-sessao.ps1` |
 
-Para cada hook, o campo **prompt** deve conter o conteúdo da seção "Prompt do Agente" do arquivo correspondente em `/agentes/`.
+### Para encerrar uma sessão
+
+Comece sua mensagem com uma das frases abaixo:
+
+- **"fim de sessão"** / **"fim da sessão"**
+- **"encerrar sessão"** / **"encerrar a sessão"**
+- **"finalizar sessão"** / **"finalizar a sessão"**
+
+O Kiro grava acontecimentos, memórias e estados de todos os personagens da sessão inteira em uma única passada.
 
 ### Personalizando o comportamento
 
-O comportamento dos agentes é ajustado em dois lugares:
-
 - **`config.md`** — define tom, modo de grupo, limites narrativos e instruções ao Guardião. É o principal ponto de personalização por campanha.
-- **Arquivos em `/agentes/`** — contêm as regras fixas de cada agente. Edite aqui apenas se quiser mudar o comportamento estrutural (ex: mudar critérios de evento marcante, adicionar novos campos ao `estado.md`).
-
-Você **não precisa criar novos agentes** — os três arquivos em `/agentes/` já são a definição completa do sistema. Os hooks apenas os ativam.
+- **Arquivos em `/agentes/`** — contêm as regras de cada passo da gravação. Edite aqui para mudar comportamento estrutural (ex: critérios de evento marcante, campos novos no `estado.md`).
+- **`ferramentas/fim-de-sessao.ps1`** — script que une os 3 agentes. Não precisa ser editado salvo se quiser mudar a estrutura do prompt combinado.
 
 ---
 
@@ -328,10 +331,15 @@ rpg/
 │       ├── ficha.md                    ✓ criado
 │       ├── estado.md                   ✓ criado
 │       └── memorias.md                 ✓ criado (vazio)
-└── agentes/
-    ├── rpg-acontecimentos.md           ✓ lido e configurado
-    ├── rpg-memorias.md                 ✓ lido e configurado
-    └── rpg-estado.md                   ✓ lido e configurado
+├── agentes/
+│   ├── rpg-acontecimentos.md           ✓ criado (fonte de verdade do passo 1)
+│   ├── rpg-memorias.md                 ✓ criado (fonte de verdade do passo 2)
+│   └── rpg-estado.md                   ✓ criado (fonte de verdade do passo 3)
+├── ferramentas/
+│   ├── rolar.ps1                       ✓ disponível (opcional)
+│   └── fim-de-sessao.ps1               ✓ criado (lê e combina os 3 agentes)
+└── .kiro/hooks/
+    └── rpg-fim-de-sessao.json          ✓ criado (dispara ao fim de sessão)
 ```
 
 Quando todos os itens estiverem marcados, você está pronto para investigar.

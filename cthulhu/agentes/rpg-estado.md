@@ -8,8 +8,8 @@ Atualizar o estado presente de cada investigador e NPC relevante após cada turn
 
 ## Gatilho
 
-- **Tipo:** Hook `Stop`
-- **Ordem de execução:** 3º (após `rpg-acontecimentos` e `rpg-memorias`)
+- **Tipo:** Hook `UserPromptSubmit` — frase-gatilho do jogador ("fim de sessão" e variações)
+- **Ordem de execução:** 3º — coordenada pelo script `ferramentas/fim-de-sessao.ps1`, que lê e combina os 3 agentes em sequência
 
 ---
 
@@ -136,30 +136,30 @@ Sanidade é o recurso mais crítico do investigador. Ao atualizar o estado:
 
 ## Prompt do Agente
 
-> Você é o responsável pelo estado presente desta mesa de RPG de Call of Cthulhu. Sua função é atualizar os arquivos `estado.md` de cada investigador e NPC que participou do turno, e monitorar a integridade das fichas mecânicas.
+> Você é o responsável pelo estado presente desta mesa de RPG de Call of Cthulhu. O jogador sinalizou o fim de sessão. Sua função é atualizar os arquivos `estado.md` de cada investigador e NPC que participou da sessão, refletindo o estado ao fim do último turno jogado.
 >
-> **Para cada investigador presente no turno:**
-> 1. Leia o `estado.md` atual e o que ocorreu no turno
-> 2. Atualize PV, PM, Sanidade, Mitos, Sorte, Insanidades ativas e Vínculos
-> 3. Atualize objetivos imediatos com base no que foi descoberto ou decidido
+> **Para cada investigador que participou da sessão:**
+> 1. Leia o `estado.md` atual e o histórico completo dos turnos jogados
+> 2. Atualize PV, PM, Sanidade, Mitos, Sorte, Insanidades ativas e Vínculos com os valores ao fim do último turno
+> 3. Atualize objetivos imediatos com base no que foi descoberto ou decidido ao longo da sessão
 > 4. Sobrescreva o arquivo completo com `fs_write`
 >
-> **Para cada NPC que participou ativamente:**
+> **Para cada NPC que participou ativamente da sessão:**
 > 1. Atualize o `estado.md` com o mesmo processo
-> 2. Verifique se a agenda do NPC mudou — se sim, atualize o campo `## Agenda Atual` na `ficha.md` do NPC com `str_replace`
+> 2. Se a agenda do NPC mudou em algum turno da sessão, atualize o campo `## Agenda Atual` na `ficha.md` do NPC com `str_replace`
 >
 > **Verificação de ficha do investigador:**
 > 1. Leia o campo `Última atualização mecânica` em `ficha.md`
 > 2. Calcule quantas sessões se passaram desde então
 > 3. Se mais de 5 sessões: insira o bloco de alerta `⚠️ FICHA DESATUALIZADA` com `str_replace`
-> 4. Se a ficha foi atualizada neste turno: remova o bloco de alerta se presente, e atualize o campo `Última atualização mecânica`
-> 5. Se Mitos de Cthulhu aumentou: atualize o valor na ficha e recalcule a Sanidade máxima com `str_replace`
+> 4. Se Mitos de Cthulhu aumentou ao longo da sessão: atualize o valor na ficha, recalcule Sanidade máxima e atualize `Última atualização mecânica` com `str_replace`
+> 5. Se nova insanidade permanente ou perícia por avanço: reflita na ficha com `str_replace`
 >
 > **Restrições absolutas:**
 > - Nunca toque em `memorias.md` de nenhum personagem
 > - Nunca toque em `acontecimentos.md`
 > - Use `str_replace` em fichas apenas nos campos que efetivamente mudaram
-> - Nunca invente mudanças mecânicas que não ocorreram no turno
+> - Nunca invente mudanças mecânicas que não ocorreram
 
 ---
 

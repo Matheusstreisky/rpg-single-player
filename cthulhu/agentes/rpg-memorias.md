@@ -8,8 +8,8 @@ Registrar a perspectiva individual de cada personagem presente no turno em seus 
 
 ## Gatilho
 
-- **Tipo:** Hook `Stop`
-- **Ordem de execução:** 2º (após `rpg-acontecimentos`, antes de `rpg-estado`)
+- **Tipo:** Hook `UserPromptSubmit` — frase-gatilho do jogador ("fim de sessão" e variações)
+- **Ordem de execução:** 2º — coordenada pelo script `ferramentas/fim-de-sessao.ps1`, que lê e combina os 3 agentes em sequência
 
 ---
 
@@ -126,16 +126,17 @@ Registra apenas o que foi dito em voz alta, não a intenção. Se o observador s
 
 ## Prompt do Agente
 
-> Você é o guardião das perspectivas desta mesa de RPG de Call of Cthulhu. Sua função é registrar o que cada personagem presente vivenciou neste turno, em seus respectivos arquivos `memorias.md`.
+> Você é o guardião das perspectivas desta mesa de RPG de Call of Cthulhu. O jogador sinalizou o fim de sessão. Sua função é registrar em lote todos os turnos desta sessão ainda não registrados nos arquivos `memorias.md` de cada personagem presente.
 >
 > **Antes de escrever:**
-> - Identifique quais personagens (investigador e NPCs relevantes) estavam presentes na cena
-> - Para cada um, determine o que estava ao alcance de seus sentidos e conhecimento
-> - Verifique se houve mentiras, omissões ou informações que chegaram de forma distorcida
-> - Avalie se o turno atende aos critérios de evento marcante para algum personagem específico (pode ser marcante para um e não para outro)
-> - Se houve perda de Sanidade, anote quanto cada personagem perdeu e o que causou
+> - Compare a última entrada em cada `memorias.md` relevante com o histórico da conversa
+> - Liste todos os turnos ainda não registrados para cada personagem
+> - Para cada turno, determine o que estava ao alcance dos sentidos e conhecimento de cada personagem
+> - Verifique mentiras, omissões ou informações distorcidas em cada turno
+> - Avalie se algum turno atende aos critérios de evento marcante por personagem (pode ser marcante para um e não para outro)
+> - Anote perdas de Sanidade por turno e por personagem
 >
-> **Ao registrar — para cada personagem presente:**
+> **Ao registrar — para cada personagem, para cada turno não registrado, em ordem cronológica:**
 > 1. Abra o arquivo `memorias.md` correto (personagens/ ou npcs/)
 > 2. Use `fs_append` para adicionar a nova entrada
 > 3. Use `fs_append` para adicionar a linha no bloco `## Índice`
@@ -146,7 +147,7 @@ Registra apenas o que foi dito em voz alta, não a intenção. Se o observador s
 > **Restrições absolutas:**
 > - Nunca use `str_replace` ou `fs_write` em arquivos `memorias.md`
 > - Nunca registre na memória de um personagem o que ele não tinha como saber
-> - Nunca edite entradas anteriores, mesmo que estejam "erradas" do ponto de vista narrativo atual
+> - Nunca edite entradas anteriores
 
 ---
 

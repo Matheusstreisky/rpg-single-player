@@ -1,5 +1,31 @@
 # Ferramentas da Mesa
 
+## `fim-de-sessao.ps1` — Gravação em lote ao fim de sessão
+
+Disparado automaticamente pelo hook `rpg-fim-de-sessao` quando o jogador começa
+uma mensagem com a frase-gatilho ("fim de sessão" e variações). Não é chamado
+manualmente — o hook cuida disso.
+
+### O que faz
+
+Lê os três arquivos de agentes em `/agentes/` e combina suas instruções num
+prompt único, que é injetado no contexto do Kiro via stdout. O Kiro então executa
+os três passos em ordem:
+
+1. **rpg-acontecimentos** — registra em `mundo/acontecimentos.md` todos os turnos
+   da sessão ainda não gravados
+2. **rpg-memorias** — registra em cada `memorias.md` a perspectiva individual de
+   cada personagem por turno
+3. **rpg-estado** — sobrescreve cada `estado.md` com o estado ao fim do último turno
+   e atualiza campos mecânicos da `ficha.md` quando necessário
+
+### Para personalizar o comportamento
+
+Edite os arquivos em `/agentes/` — eles são a fonte da verdade de cada passo.
+O script em si não precisa ser alterado para mudanças de regras ou formato.
+
+---
+
 ## `rolar.ps1` — Rolador de dados (Call of Cthulhu 7ª Edição)
 
 Rola d100 e aplica as regras de grau de sucesso definidas em `config.md`.

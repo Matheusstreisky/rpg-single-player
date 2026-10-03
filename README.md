@@ -32,6 +32,22 @@ projeto funciona 100% sem eles — o jogador sempre pode rolar os próprios dado
   de sucessos, mesclagem crítica, Dados de Fome). Veja
   `vampiro/ferramentas/README.md`.
 
+## Rodar localmente, sem o Kiro (opcional)
+
+O caminho padrão é jogar com o Kiro como mestre. Mas dá para rodar o mestre e os
+agentes de memória **inteiramente no seu computador**, via DeepSeek + Ollama, sem
+depender de APIs externas nem do Kiro.
+
+O guia **`como-rodar-local.md`** (na raiz) cobre esse caminho de ponta a ponta:
+escolha de modelo, instalação do Ollama e do Open WebUI, criação do modelo do mestre
+e registro das ferramentas de arquivo. Ele é **agnóstico de sistema** — serve tanto
+para `cthulhu/` quanto para `vampiro/`; basta ajustar os textos e caminhos para a
+pasta do sistema que você vai jogar.
+
+> Vale notar: no modo local via Ollama, a gravação dos agentes acontece por turno
+> (via function calling), e não pelo hook de fim de sessão do Kiro. O hook
+> `rpg-fim-de-sessao` descrito em cada `arquitetura.md` é específico do Kiro.
+
 ## Como o versionamento é organizado (importante)
 
 A ideia é que **qualquer pessoa possa clonar e jogar**, e que **uma nova versão
