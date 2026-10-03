@@ -324,7 +324,7 @@ Em CoC isso é especialmente relevante: cultos mentem sistematicamente, NPCs esc
 
 ## Carregamento de Contexto por Sessão
 
-No início de cada sessão, os arquivos relevantes são fornecidos via `#File` no chat. Um hook de `SessionStart` injeta automaticamente `config.md` e `acontecimentos.md`.
+No início de cada sessão, os arquivos relevantes são fornecidos via `#File` no chat.
 
 | Situação | Arquivos recomendados |
 |---|---|
@@ -342,41 +342,47 @@ No início de cada sessão, os arquivos relevantes são fornecidos via `#File` n
 Três agentes com responsabilidades separadas e bem definidas. Cada um tem seu arquivo de design em `/agentes/`.
 
 ### `rpg-acontecimentos`
-- **Gatilho:** Hook `Stop` — dispara ao fim de cada turno
+- **Gatilho:** Hook `UserPromptSubmit` — dispara ao fim de sessão, via script `ferramentas/fim-de-sessao.ps1`
 - **Arquivos que toca:** `mundo/acontecimentos.md`
 - **Operação permitida:** `fs_append` apenas
-- **Responsabilidade:** Registrar o fato objetivo e neutro do turno; manter o índice atualizado
+- **Responsabilidade:** Registrar em lote todos os turnos da sessão não registrados; manter o índice atualizado
 
 ### `rpg-memorias`
-- **Gatilho:** Hook `Stop` — dispara após `rpg-acontecimentos`
-- **Arquivos que toca:** `memorias.md` de cada personagem/NPC presente na cena
+- **Gatilho:** Hook `UserPromptSubmit` — dispara ao fim de sessão, coordenado pelo mesmo script (2º na sequência)
+- **Arquivos que toca:** `memorias.md` de cada personagem/NPC presente nas cenas
 - **Operação permitida:** `fs_append` apenas
-- **Responsabilidade:** Registrar perspectiva individual de cada personagem; detectar eventos marcantes; registrar mentiras e omissões corretamente; registrar perda de sanidade na perspectiva de quem a viveu
+- **Responsabilidade:** Registrar em lote a perspectiva individual de cada personagem por turno; detectar eventos marcantes; registrar mentiras e omissões corretamente; registrar perdas de sanidade
 
 ### `rpg-estado`
-- **Gatilho:** Hook `Stop` — dispara após `rpg-memorias`
+- **Gatilho:** Hook `UserPromptSubmit` — dispara ao fim de sessão, coordenado pelo mesmo script (3º na sequência)
 - **Arquivos que toca:** `estado.md` de cada personagem/NPC; campos específicos de `ficha.md`
 - **Operações permitidas:** `fs_write` em `estado.md`; `str_replace` em campos específicos de `ficha.md`
-- **Responsabilidade:** Atualizar estado presente (PV, PM, Sanidade, Mitos, Sorte, Insanidades); verificar desatualização da ficha (> 5 sessões); atualizar agenda de NPCs
+- **Responsabilidade:** Atualizar estado presente ao fim da sessão (PV, PM, Sanidade, Mitos, Sorte, Insanidades); verificar desatualização da ficha (> 5 sessões); atualizar agenda de NPCs
 
-### Fluxo de um Turno
+### Fluxo de Fim de Sessão
 
 ```
-Guardião encerra o turno
+Jogador digita "fim de sessão" (ou variação)
         ↓
-Hook Stop dispara
+Hook UserPromptSubmit dispara
         ↓
-[1] rpg-acontecimentos
-    → fs_append em acontecimentos.md (fato neutro + índice)
+ferramentas/fim-de-sessao.ps1 roda
+    → lê agentes/rpg-acontecimentos.md
+    → lê agentes/rpg-memorias.md
+    → lê agentes/rpg-estado.md
+    → combina e injeta instruções no contexto do Kiro
         ↓
-[2] rpg-memorias
-    → para cada personagem presente:
+[1] rpg-acontecimentos (em lote — todos os turnos não registrados)
+    → fs_append em acontecimentos.md (fatos neutros + índice)
+        ↓
+[2] rpg-memorias (em lote — todos os turnos não registrados)
+    → para cada personagem, para cada turno:
         → avalia perspectiva individual
         → fs_append em memorias.md
         → aplica formato ⚠️ se critério atendido
         → atualiza índice de memorias.md
         ↓
-[3] rpg-estado
+[3] rpg-estado (estado ao fim do último turno)
     → fs_write em estado.md de cada personagem
     → atualiza Sanidade, PV, PM, Sorte, Mitos, Insanidades
     → str_replace em agenda de NPCs se mudou
@@ -393,7 +399,7 @@ Sessão encerrada — todos os arquivos atualizados
 |---|---|
 | **Plataforma** | Kiro IDE |
 | **Guardião** | Kiro (Claude) em sessão Vibe |
-| **Automação** | Hooks do Kiro (`Stop` e `SessionStart`) |
+| **Automação** | Hook do Kiro (`UserPromptSubmit` — fim de sessão) + script PowerShell |
 | **Agentes** | 3 agentes customizados em `/agentes/` |
 | **Ferramentas** | Rolador de dados opcional (`ferramentas/rolar.ps1`) — ver seção "Ferramentas da Mesa" |
 | **Formato** | Markdown puro para todos os arquivos |

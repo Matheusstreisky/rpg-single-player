@@ -1,6 +1,14 @@
 # Como Rodar o Sistema Localmente com DeepSeek + Ollama
 
-Guia para rodar o narrador e os agentes de memória inteiramente no seu computador, sem depender de APIs externas ou do Kiro como plataforma de narração.
+Guia para rodar o mestre (Guardião no cthulhu, Narrador no vampiro) e os agentes de
+memória inteiramente no seu computador, sem depender de APIs externas ou do Kiro como
+plataforma de narração.
+
+> **Vale para os dois sistemas.** Este guia é agnóstico de sistema: funciona tanto para
+> `cthulhu/` (Call of Cthulhu 7ª Edição) quanto para `vampiro/` (Vampiro: A Máscara 5ª
+> Edição). Onde um exemplo cita um sistema específico, troque o texto e os caminhos pela
+> pasta do sistema que você vai jogar. Rode os comandos a partir da pasta do sistema
+> escolhido (ex: `cd cthulhu` ou `cd vampiro`).
 
 ---
 
@@ -116,21 +124,25 @@ ollama run MFDoom/deepseek-r1-tool-calling:14b
 
 Use `Ctrl+D` ou `/bye` para sair.
 
-### Criando o modelo do narrador
+### Criando o modelo do mestre
 
-Crie um `Modelfile` na raiz do projeto para configurar o modelo com contexto estendido:
+Crie um `Modelfile` na pasta do sistema que você vai jogar (ex: `cthulhu/` ou `vampiro/`) para configurar o modelo com contexto estendido:
 
 ```
 FROM MFDoom/deepseek-r1-tool-calling:14b
 PARAMETER num_ctx 16384
 SYSTEM """
-Você é o narrador de uma campanha de Vampiro: A Máscara single-player.
+Você é o mestre de uma campanha de RPG single-player.
 Siga estritamente as instruções do arquivo config.md fornecido no início de cada sessão.
 Narre sempre em segunda pessoa.
 Mantenha coerência com todos os arquivos de contexto fornecidos.
 Ao fim de cada turno, aguarde instrução do jogador antes de continuar.
 """
 ```
+
+> Ajuste a primeira linha do `SYSTEM` ao seu sistema: *"Você é o Guardião de uma campanha
+> de Call of Cthulhu 7ª Edição single-player."* para o cthulhu, ou *"Você é o Narrador de
+> uma campanha de Vampiro: A Máscara single-player."* para o vampiro.
 
 Registre o modelo customizado:
 
@@ -176,6 +188,11 @@ Para que os agentes rodem automaticamente ao fim de cada turno, você precisa re
 
 O Open WebUI suporta ferramentas customizadas em Python. Crie uma ferramenta para cada operação de arquivo que os agentes usam:
 
+> **Ajuste o caminho base.** Nos exemplos abaixo, troque `c:/Projetos/rpg-single-player/vampiro`
+> pelo caminho da pasta do sistema que você está jogando (ex:
+> `c:/Projetos/rpg-single-player/cthulhu`). Todos os caminhos de arquivo passados às
+> ferramentas são relativos a essa pasta base.
+
 1. No Open WebUI, acesse **Settings → Tools → Create Tool**
 2. Crie as seguintes ferramentas:
 
@@ -184,7 +201,7 @@ O Open WebUI suporta ferramentas customizadas em Python. Crie uma ferramenta par
 def append_file(path: str, content: str) -> str:
     """Adiciona conteúdo ao final de um arquivo sem sobrescrever."""
     import os
-    full_path = os.path.join("c:/Projetos/rpg", path)
+    full_path = os.path.join("c:/Projetos/rpg-single-player/vampiro", path)
     with open(full_path, "a", encoding="utf-8") as f:
         f.write("\n" + content)
     return f"Conteúdo adicionado em {path}"
@@ -195,7 +212,7 @@ def append_file(path: str, content: str) -> str:
 def write_file(path: str, content: str) -> str:
     """Sobrescreve um arquivo com novo conteúdo."""
     import os
-    full_path = os.path.join("c:/Projetos/rpg", path)
+    full_path = os.path.join("c:/Projetos/rpg-single-player/vampiro", path)
     with open(full_path, "w", encoding="utf-8") as f:
         f.write(content)
     return f"Arquivo {path} atualizado"
@@ -206,7 +223,7 @@ def write_file(path: str, content: str) -> str:
 def read_file(path: str) -> str:
     """Lê o conteúdo de um arquivo."""
     import os
-    full_path = os.path.join("c:/Projetos/rpg", path)
+    full_path = os.path.join("c:/Projetos/rpg-single-player/vampiro", path)
     with open(full_path, "r", encoding="utf-8") as f:
         return f.read()
 ```
@@ -246,7 +263,7 @@ Se o function calling falhar num turno específico, rode o agente manualmente:
 <conteúdo do estado>
 
 ---
-Você é o narrador desta campanha. Sessão XX, Turno 01. Pode começar.
+Você é o mestre desta campanha. Sessão XX, Turno 01. Pode começar.
 ```
 
 ### Durante a sessão
@@ -299,4 +316,4 @@ Carregue `acontecimentos.md` + os estados atuais para o modelo se situar antes d
 [ ] Ferramentas     → criar append_file, write_file, read_file no Open WebUI (Passo 4)
 ```
 
-Com isso, você tem um narrador de RPG com agentes automáticos rodando inteiramente no seu computador.
+Com isso, você tem um mestre de RPG com agentes automáticos rodando inteiramente no seu computador.
