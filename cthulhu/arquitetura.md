@@ -17,7 +17,8 @@ rpg/
 ├── agentes/                    # Definições e prompts dos agentes de automação
 │   ├── rpg-acontecimentos.md   # Agente: atualiza o log de fatos objetivos
 │   ├── rpg-memorias.md         # Agente: atualiza memórias individuais dos personagens
-│   └── rpg-estado.md           # Agente: atualiza o estado presente de cada personagem
+│   ├── rpg-estado.md           # Agente: atualiza o estado presente de cada personagem
+│   └── rpg-arquivista.md       # Agente: arquiva sessões antigas quando os arquivos crescem demais
 │
 ├── ferramentas/                # Utilitários opcionais da mesa
 │   ├── rolar.ps1               # Rolador de dados d100 (CoC 7e) — opcional
@@ -25,20 +26,31 @@ rpg/
 │
 ├── mundo/
 │   ├── mundo.md                # Lore geral, localidade, facções, NPCs menores
-│   └── acontecimentos.md       # Log cronológico e objetivo de eventos (com índice)
+│   ├── acontecimentos.md       # Log ATIVO de eventos (índice das sessões ativas + entradas recentes)
+│   └── acontecimentos/         # Partes arquivadas (criadas pelo rpg-arquivista)
+│       ├── indice.md           # Índice-mestre das sessões arquivadas
+│       └── acontecimentos-parte-NN.md  # Sessões antigas — imutáveis
 │
 ├── personagens/
 │   └── [nome]/
 │       ├── ficha.md            # Características, perícias, feitiços, background
 │       ├── estado.md           # Estado presente: sanidade, vínculos, objetivos imediatos
-│       └── memorias.md         # Experiências acumuladas — append-only
+│       ├── memorias.md         # Experiências acumuladas — append-only (arquivo ativo)
+│       └── memorias/           # Partes arquivadas (criadas pelo rpg-arquivista)
+│           ├── indice.md       # Índice-mestre das sessões arquivadas
+│           └── memorias-parte-NN.md    # Sessões antigas — imutáveis
 │
 └── npcs/
     └── [nome]/
         ├── ficha.md            # Perfil, motivações, segredos, agenda atual
         ├── estado.md           # Estado presente do NPC
-        └── memorias.md         # Histórico de interações — append-only
+        ├── memorias.md         # Histórico de interações — append-only (arquivo ativo)
+        └── memorias/           # Partes arquivadas (criadas pelo rpg-arquivista)
+            ├── indice.md       # Índice-mestre das sessões arquivadas
+            └── memorias-parte-NN.md    # Sessões antigas — imutáveis
 ```
+
+> As pastas de partes (`acontecimentos/`, `memorias/`) e seus arquivos só existem depois que o `rpg-arquivista` arquiva pela primeira vez. Até lá, há apenas o arquivo ativo. Ver seção **Arquivamento de Arquivos Longos**.
 
 NPCs seguem um modelo progressivo de complexidade — veja a seção **Ciclo de Vida de NPCs** para detalhes.
 
@@ -144,14 +156,25 @@ O Guardião introduz personagens potenciais naturalmente no decorrer da históri
 
 ### Imutabilidade
 
-Arquivos de memória (`memorias.md`) são **append-only** — nenhuma entrada existente pode ser alterada ou removida. Apenas novos blocos são adicionados ao final.
+Arquivos de memória (`memorias.md`) e o log de `acontecimentos.md` são **append-only** — nenhuma entrada existente pode ser alterada ou removida. Apenas novos blocos são adicionados ao final.
 
 Isso garante:
 - Integridade histórica da narrativa
 - Rastreabilidade de decisões e mudanças de perspectiva
 - Fidelidade ao passado mesmo quando personagens evoluem (ou decaem)
 
-Os agentes de memória usam **apenas `fs_append`** nesses arquivos, nunca `str_replace` ou `fs_write`.
+Os agentes `rpg-acontecimentos` e `rpg-memorias` usam **apenas `fs_append`** nesses arquivos, nunca `str_replace` ou `fs_write`. **Isso não muda.**
+
+#### Exceção única: o `rpg-arquivista`
+
+O agente `rpg-arquivista` é a **única** exceção autorizada, e apenas para a mecânica de arquivamento (ver seção **Arquivamento de Arquivos Longos**). A regra de imutabilidade passa a ter dois níveis:
+
+| Camada | Mutabilidade | Quem escreve |
+|---|---|---|
+| Arquivo ativo (`acontecimentos.md`, `memorias.md`) | append pelos agentes de memória; **reescrito só pelo arquivista** ao arquivar | `rpg-memorias`/`rpg-acontecimentos` via `fs_append`; `rpg-arquivista` via `fs_write` |
+| Arquivos-parte (`*-parte-NN.md`) | **permanentemente imutáveis** após criados | `rpg-arquivista` cria uma vez e nunca reabre |
+
+O **conteúdo histórico continua imutável** no sentido original: nenhuma entrada é alterada ou apagada. Ao arquivar, o arquivista apenas **move blocos inteiros, verbatim**, do arquivo ativo para uma parte permanente. Nenhum outro agente escreve no arquivo ativo com algo diferente de `fs_append`.
 
 ### Perspectiva Individual
 
@@ -169,9 +192,10 @@ Informações que um personagem não tinha acesso **não aparecem em sua memóri
 
 | Arquivo | Natureza | Quem escreve |
 |---|---|---|
-| `memorias.md` | Passado imutável — o que aconteceu | `rpg-memorias` via `fs_append` |
+| `memorias.md` | Passado imutável — o que aconteceu | `rpg-memorias` via `fs_append`; `rpg-arquivista` reescreve só ao arquivar |
 | `estado.md` | Presente mutável — como está agora | `rpg-estado` via `fs_write` |
 | `ficha.md` | Estrutura mecânica — características e perícias | `rpg-estado` via `str_replace` (campos específicos) |
+| `*-parte-NN.md` | Passado arquivado — imutável permanente | `rpg-arquivista` cria uma vez, nunca reabre |
 
 ---
 
@@ -339,7 +363,7 @@ No início de cada sessão, os arquivos relevantes são fornecidos via `#File` n
 
 ## Agentes de Memória
 
-Três agentes com responsabilidades separadas e bem definidas. Cada um tem seu arquivo de design em `/agentes/`.
+Quatro agentes com responsabilidades separadas e bem definidas. Cada um tem seu arquivo de design em `/agentes/`. Os três primeiros gravam os registros da sessão; o quarto arquiva arquivos longos e **nunca interfere** no trabalho dos demais.
 
 ### `rpg-acontecimentos`
 - **Gatilho:** Hook `UserPromptSubmit` — dispara ao fim de sessão, via script `ferramentas/fim-de-sessao.ps1`
@@ -359,6 +383,13 @@ Três agentes com responsabilidades separadas e bem definidas. Cada um tem seu a
 - **Operações permitidas:** `fs_write` em `estado.md`; `str_replace` em campos específicos de `ficha.md`
 - **Responsabilidade:** Atualizar estado presente ao fim da sessão (PV, PM, Sanidade, Mitos, Sorte, Insanidades); verificar desatualização da ficha (> 5 sessões); atualizar agenda de NPCs
 
+### `rpg-arquivista`
+- **Gatilho:** Hook `UserPromptSubmit` — dispara ao fim de sessão, coordenado pelo mesmo script (4º e último na sequência)
+- **Arquivos que toca:** arquivos ativos `mundo/acontecimentos.md` e cada `memorias.md`; cria arquivos-parte e índices-mestre nas pastas de arquivamento
+- **Operações permitidas:** `fs_write` nos arquivos ativos e nas partes; `fs_write`/`fs_append` nos índices-mestre — **única exceção à regra de append-only**
+- **Responsabilidade:** Quando um arquivo ativo passa de 1500 linhas, mover as sessões completas mais antigas (nunca cortando no meio de um turno) para um arquivo-parte imutável e registrá-las no índice-mestre; não faz nada se nenhum arquivo passou do limite
+- **Não interfere** nos três agentes anteriores: roda só depois que eles concluem e nunca reescreve o que gravaram
+
 ### Fluxo de Fim de Sessão
 
 ```
@@ -370,6 +401,7 @@ ferramentas/fim-de-sessao.ps1 roda
     → lê agentes/rpg-acontecimentos.md
     → lê agentes/rpg-memorias.md
     → lê agentes/rpg-estado.md
+    → lê agentes/rpg-arquivista.md
     → combina e injeta instruções no contexto do Kiro
         ↓
 [1] rpg-acontecimentos (em lote — todos os turnos não registrados)
@@ -388,8 +420,46 @@ ferramentas/fim-de-sessao.ps1 roda
     → str_replace em agenda de NPCs se mudou
     → verifica ficha: se > 5 sessões sem update, insere alerta
         ↓
+[4] rpg-arquivista (manutenção — roda por último)
+    → para cada arquivo ativo (acontecimentos.md e cada memorias.md):
+        → conta linhas; se ≤ 1500, não faz nada
+        → se > 1500: move sessões completas mais antigas para
+          um novo arquivo-parte imutável (fs_write)
+        → reescreve o arquivo ativo sem as sessões movidas (fs_write)
+        → atualiza o índice-mestre indice.md da pasta de partes
+        ↓
 Sessão encerrada — todos os arquivos atualizados
 ```
+
+---
+
+## Arquivamento de Arquivos Longos
+
+Os arquivos append-only crescem a cada sessão. Deixados sem controle, `acontecimentos.md` e os `memorias.md` ficariam grandes a ponto de pesar no contexto de cada turno — mais tokens, mais custo, leitura mais lenta. O agente `rpg-arquivista` resolve isso **sem perder nada do histórico**.
+
+### Como funciona
+
+- **Limite:** quando um arquivo ativo passa de **1500 linhas**, o arquivista entra em ação (no fim da sessão, depois dos outros três agentes).
+- **Corte por sessão:** ele move as **sessões completas mais antigas** para um arquivo-parte. Nunca parte um turno, um evento marcante ou uma sessão no meio.
+- **Partes imutáveis:** cada arquivo-parte (`*-parte-NN.md`) é fechado e nunca mais alterado. Novas sessões arquivadas vão sempre para uma parte nova.
+- **Conteúdo verbatim:** as entradas são movidas exatamente como estavam — o arquivista não reescreve texto de turno.
+
+### Estrutura resultante (Opção B — índice-mestre separado)
+
+Cada arquivo append-only ganha, ao ser arquivado pela primeira vez, uma pasta própria com as partes e um índice-mestre:
+
+```
+mundo/
+├── acontecimentos.md              # ATIVO: índice só das sessões ativas + entradas recentes
+└── acontecimentos/
+    ├── indice.md                  # ÍNDICE-MESTRE: aponta para as sessões arquivadas
+    ├── acontecimentos-parte-01.md # imutável
+    └── acontecimentos-parte-02.md # imutável
+```
+
+O **arquivo ativo** mantém só o índice das sessões que ainda estão nele e um aviso apontando para o `indice.md`. O **índice-mestre** concentra os links de tudo que foi arquivado, agrupado por parte, com links relativos (`acontecimentos-parte-01.md#âncora`). Durante o jogo normal carrega-se apenas o arquivo ativo; as partes só são abertas quando se precisa consultar o passado distante.
+
+O design detalhado (formato das partes, do índice-mestre, regra de âncoras, checklist) está em `agentes/rpg-arquivista.md`.
 
 ---
 
@@ -400,7 +470,7 @@ Sessão encerrada — todos os arquivos atualizados
 | **Plataforma** | Kiro IDE |
 | **Guardião** | Kiro (Claude) em sessão Vibe |
 | **Automação** | Hook do Kiro (`UserPromptSubmit` — fim de sessão) + script PowerShell |
-| **Agentes** | 3 agentes customizados em `/agentes/` |
+| **Agentes** | 4 agentes customizados em `/agentes/` (3 de gravação + 1 arquivista) |
 | **Ferramentas** | Rolador de dados opcional (`ferramentas/rolar.ps1`) — ver seção "Ferramentas da Mesa" |
 | **Formato** | Markdown puro para todos os arquivos |
 | **Persistência** | Garantida pelos arquivos — Kiro não tem memória nativa entre sessões |
