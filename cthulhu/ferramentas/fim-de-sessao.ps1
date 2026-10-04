@@ -45,31 +45,40 @@ $raiz = Split-Path -Parent $PSScriptRoot
 $passo1 = Get-Content "$raiz\agentes\rpg-acontecimentos.md" -Raw -Encoding UTF8
 $passo2 = Get-Content "$raiz\agentes\rpg-memorias.md"      -Raw -Encoding UTF8
 $passo3 = Get-Content "$raiz\agentes\rpg-estado.md"        -Raw -Encoding UTF8
+$passo4 = Get-Content "$raiz\agentes\rpg-arquivista.md"    -Raw -Encoding UTF8
 
 # --- Saida combinada para o Kiro ---
 $prompt = @"
-O jogador sinalizou o fim de sessao. Execute os tres agentes de memoria em lote, na ordem abaixo.
-Processe TODOS os turnos desta sessao ainda nao registrados nos arquivos — nao apenas o ultimo turno.
+O jogador sinalizou o fim de sessao. Execute os quatro agentes em lote, na ordem abaixo.
+Os passos 1 a 3 gravam os registros desta sessao; processe TODOS os turnos ainda nao
+registrados nos arquivos — nao apenas o ultimo turno. O passo 4 (arquivista) roda por
+ultimo, somente apos os tres primeiros concluirem, e nao interfere no trabalho deles.
 
 ================================================================
-PASSO 1 DE 3 — AGENTE: rpg-acontecimentos
+PASSO 1 DE 4 — AGENTE: rpg-acontecimentos
 ================================================================
 $passo1
 
 ================================================================
-PASSO 2 DE 3 — AGENTE: rpg-memorias
+PASSO 2 DE 4 — AGENTE: rpg-memorias
 ================================================================
 $passo2
 
 ================================================================
-PASSO 3 DE 3 — AGENTE: rpg-estado
+PASSO 3 DE 4 — AGENTE: rpg-estado
 ================================================================
 $passo3
 
 ================================================================
-Ao concluir os 3 passos, informe de forma compacta:
+PASSO 4 DE 4 — AGENTE: rpg-arquivista
+================================================================
+$passo4
+
+================================================================
+Ao concluir os 4 passos, informe de forma compacta:
 - Quais arquivos foram atualizados
 - Quais turnos foram registrados (ou que ja estavam em dia)
+- Se o arquivista arquivou alguma sessao (qual arquivo, quais sessoes, qual parte) ou se nao havia arquivamento pendente
 Confirme o encerramento da sessao ao jogador.
 ================================================================
 "@

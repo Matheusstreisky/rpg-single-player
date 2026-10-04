@@ -4,7 +4,7 @@
     {
       "name": "Gravação de Fim de Sessão",
       "trigger": "UserPromptSubmit",
-      "description": "Ao detectar frase de fim de sessão no início da mensagem, roda o script que lê os 3 agentes em /agentes/ e injeta as instruções combinadas no contexto do Kiro para gravação em lote.",
+      "description": "Ao detectar frase de fim de sessão no início da mensagem, roda o script que lê os 4 agentes em /agentes/ (acontecimentos, memorias, estado e arquivista) e injeta as instruções combinadas no contexto do Kiro para gravação em lote.",
       "matcher": "(?i)^(fim\\s+da?\\s+sess[aã]o|encerrar(\\s+a)?\\s+sess[aã]o|finalizar(\\s+a)?\\s+sess[aã]o)",
       "action": {
         "type": "command",

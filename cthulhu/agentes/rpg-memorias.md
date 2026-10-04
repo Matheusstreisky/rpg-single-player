@@ -15,7 +15,10 @@ Registrar a perspectiva individual de cada personagem presente no turno em seus 
 
 ## Regras de Operação
 
-1. **Somente `fs_append`** — nunca `str_replace` ou `fs_write` em arquivos de memória
+1. **`str_replace` para o índice, `fs_append` para o corpo** — nunca `fs_write` em arquivos de memória
+   - Inserir linha de índice: `str_replace` substituindo `\n\n---\n\n## ` (o separador antes do primeiro `## Sessão` do corpo) por `\n- [nova linha de índice]\n\n---\n\n## `
+   - Adicionar corpo da entrada: `fs_append` ao final do arquivo
+   - ⚠️ **Caso de borda:** se ao ler o arquivo você encontrar um `---` entre o cabeçalho `## Índice` e as linhas de lista `- [`, ignore esse separador. O único ponto de inserção correto é o `---` que precede imediatamente o primeiro `## Sessão` do corpo. Nunca insira antes do primeiro `---` quando houver dois.
 2. **Perspectiva estrita** — cada registro reflete apenas o que aquele personagem vivenciou, sentiu e concluiu
 3. **Informação limitada ao acesso** — se o personagem não estava presente ou não tinha como saber, não registra
 4. **Mentiras e omissões** — registradas corretamente em cada perspectiva (ver seção abaixo)
@@ -138,14 +141,14 @@ Registra apenas o que foi dito em voz alta, não a intenção. Se o observador s
 >
 > **Ao registrar — para cada personagem, para cada turno não registrado, em ordem cronológica:**
 > 1. Abra o arquivo `memorias.md` correto (personagens/ ou npcs/)
-> 2. Use `fs_append` para adicionar a nova entrada
-> 3. Use `fs_append` para adicionar a linha no bloco `## Índice`
+> 2. Use `str_replace` para inserir a linha de índice antes do separador `---` do corpo (substitui `\n\n---\n\n## ` por `\n- [nova linha de índice]\n\n---\n\n## `)
+> 3. Use `fs_append` para adicionar o corpo da nova entrada
 > 4. Se for evento marcante, use o formato `⚠️ EVENTO MARCANTE`
 > 5. Registre mentiras e omissões conforme a perspectiva de cada um
 > 6. Registre perdas de Sanidade com o peso emocional correto para aquele personagem
 >
 > **Restrições absolutas:**
-> - Nunca use `str_replace` ou `fs_write` em arquivos `memorias.md`
+> - Nunca use `fs_write` em arquivos `memorias.md` (apenas `str_replace` para o índice e `fs_append` para o corpo)
 > - Nunca registre na memória de um personagem o que ele não tinha como saber
 > - Nunca edite entradas anteriores
 
@@ -180,9 +183,10 @@ Antes de finalizar, confirme:
 
 - [ ] Todos os personagens presentes na cena receberam entrada
 - [ ] Nenhum personagem ausente recebeu entrada
-- [ ] Cada registro usa apenas `fs_append`
+- [ ] A linha de índice foi inserida via `str_replace` antes do separador `---` do corpo
+- [ ] O corpo de cada entrada foi adicionado via `fs_append` ao final do arquivo
 - [ ] Perspectivas divergentes estão corretamente separadas
 - [ ] Mentiras foram registradas corretamente em cada visão
 - [ ] Perdas de Sanidade foram registradas com peso emocional na perspectiva de quem as viveu
 - [ ] Evento marcante foi formatado com `⚠️` quando aplicável
-- [ ] Linhas de índice foram appended para cada arquivo atualizado
+- [ ] Linhas de índice foram inseridas via `str_replace` no índice de cada arquivo atualizado

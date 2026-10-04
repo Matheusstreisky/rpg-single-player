@@ -31,6 +31,12 @@
 !*/npcs/jacinto/
 
 # ---------------------------------------------------------------------------
+#  Kiro IDE — configurações locais (apenas raiz; cthulhu/.kiro e vampiro/.kiro
+#  contêm os hooks do jogo e permanecem versionados)
+# ---------------------------------------------------------------------------
+/.kiro/
+
+# ---------------------------------------------------------------------------
 #  Ruído de sistema operacional / editor
 # ---------------------------------------------------------------------------
 Thumbs.db
@@ -38,4 +44,3 @@ Desktop.ini
 .DS_Store
 *~
 *.tmp
-New folder/
