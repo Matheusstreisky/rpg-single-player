@@ -15,7 +15,9 @@ Registrar o fato objetivo e neutro de cada turno em `mundo/acontecimentos.md`. �
 
 ## Regras de Operação
 
-1. **Somente `fs_append`** — nunca `str_replace` ou `fs_write`
+1. **`str_replace` para o índice, `fs_append` para o corpo** — nunca `fs_write` no arquivo ativo
+   - Inserir linha de índice: `str_replace` substituindo o separador `\n---\n` (entre o bloco de índice e o corpo) por `\n- [nova linha de índice]\n---\n`
+   - Adicionar corpo da entrada: `fs_append` ao final do arquivo
 2. **Neutralidade absoluta** — sem emoções, julgamentos ou perspectivas de personagens
 3. **Apenas fatos observáveis** — o que qualquer observador presente na cena teria visto ou ouvido
 4. **Não registra segredos internos** — pensamentos, intenções não expressas e informações que nenhum presente poderia saber ficam fora
@@ -78,13 +80,13 @@ Para eventos marcantes:
 > - Determine se algum turno atende aos critérios de evento marcante (veja `arquitetura.md`)
 >
 > **Ao registrar (para cada turno não registrado, em ordem cronológica):**
-> - Use `fs_append` para adicionar a nova entrada ao final de `mundo/acontecimentos.md`
-> - Use `fs_append` para adicionar a linha correspondente no bloco `## Índice`
+> - Use `str_replace` para inserir a nova linha de índice antes do separador `---` (substitui `\n---\n` por `\n- [nova linha de índice]\n---\n`)
+> - Use `fs_append` para adicionar o corpo da nova entrada ao final de `mundo/acontecimentos.md`
 > - Mantenha tom neutro e jornalístico — sem emoções ou perspectivas de nenhum personagem
 > - Inclua falas ditas em voz alta, com atribuição clara
 > - Não registre pensamentos, intenções não verbalizadas ou informações que nenhum presente poderia saber
 >
-> **Nunca use `str_replace` ou `fs_write` neste arquivo.**
+> **Nunca use `fs_write` neste arquivo. `str_replace` é permitido apenas para inserir a linha de índice antes do `---` — nunca para editar o conteúdo das entradas.**
 
 ---
 
@@ -111,9 +113,9 @@ Marcus confrontou o Príncipe Aldric sobre a morte de seu sire, Eleonora. O Prí
 
 Antes de finalizar, confirme:
 
-- [ ] A entrada usa apenas `fs_append`
+- [ ] A linha de índice foi inserida via `str_replace` antes do separador `---`
+- [ ] O corpo da entrada foi adicionado via `fs_append` ao final do arquivo
 - [ ] O tom é neutro — sem emoções ou perspectivas individuais
 - [ ] Apenas fatos observáveis foram registrados
-- [ ] A linha de índice foi appended
 - [ ] Falas em voz alta estão entre aspas e atribuídas
 - [ ] Pensamentos e intenções internas foram omitidos

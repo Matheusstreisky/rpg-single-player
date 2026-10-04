@@ -147,10 +147,10 @@ Exemplos:
 >
 > 1. Conte as linhas do arquivo ativo. Se for 1500 ou menos, **não faça nada** nesse arquivo — passe ao próximo.
 > 2. Se passou de 1500 linhas, identifique as **sessões completas mais antigas** a arquivar. Selecione sessões inteiras, da mais antiga em diante, o suficiente para o arquivo ativo cair para a faixa de ~800–1200 linhas. **Nunca** corte no meio de um turno, de um evento marcante ou de uma sessão. Mantenha ao menos a última sessão completa no arquivo ativo.
-> 3. Determine o número da próxima parte: olhe a pasta de partes (ex.: `mundo/acontecimentos/`); se existe `acontecimentos-parte-01.md`, a nova é `-parte-02.md`, e assim por diante. Partes existentes são imutáveis — **nunca** as reabra.
+> 3. Determine o número da próxima parte: olhe a pasta de partes (ex.: `mundo/acontecimentos/`); se existe `acontecimentos-parte-01.md`, a nova é `-parte-02.md`, e assim por diante. Partes existentes são imutáveis — **nunca** as reabra. Use apenas arquivos com nome `parte-NN.md` válido na contagem (ignore arquivos sem número válido, que podem ser artefatos de runs com falha).
 > 4. Crie o novo arquivo-parte com `fs_write`: cabeçalho com a cobertura (sessões e turnos) e a nota de imutabilidade, seguido das entradas movidas **verbatim** (copie exatamente, sem reescrever nenhuma linha).
-> 5. Reescreva o arquivo ativo com `fs_write`: cabeçalho, aviso apontando para o `indice.md`, o índice só das sessões que permaneceram ativas, e as entradas ativas verbatim. As sessões movidas saem do arquivo ativo.
-> 6. Atualize o índice-mestre (`indice.md` dentro da pasta de partes): se não existir, crie-o com `fs_write`; adicione uma seção para a nova parte com uma linha por turno arquivado, cada uma com link relativo `*-parte-NN.md#âncora`. Preserve as âncoras exatamente como no sistema (incluindo o `⚠️` dos eventos marcantes).
+> 5. Atualize o índice-mestre (`indice.md` dentro da pasta de partes): se não existir, crie-o com `fs_write`; adicione uma seção para a nova parte com uma linha por turno arquivado, cada uma com link relativo `*-parte-NN.md#âncora`. Preserve as âncoras exatamente como no sistema (incluindo o `⚠️` dos eventos marcantes).
+> 6. Reescreva o arquivo ativo com `fs_write` **somente após a parte e o índice estarem gravados**: cabeçalho, aviso apontando para o `indice.md`, o índice só das sessões que permaneceram ativas, e as entradas ativas verbatim. As sessões movidas saem do arquivo ativo. **Reescrever o ativo deve ser sempre a última operação** — se o processo for interrompido antes, as sessões ainda estão no ativo e nenhum dado é perdido.
 >
 > **Restrições absolutas:**
 > - Nunca altere o texto de uma entrada. Você move blocos inteiros, verbatim.
