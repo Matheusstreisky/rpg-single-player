@@ -117,8 +117,24 @@ Para `memorias.md`, a estrutura é a mesma, trocando os caminhos (`memorias/`, `
 
 ## Links e Âncoras
 
-- Âncora de um cabeçalho markdown: minúsculas, espaços viram `-`, pontuação removida. `## Sessão 01 — Turno 07 ⚠️` vira `#sessão-01--turno-07-️`.
-- As entradas de evento marcante já usam esse padrão de âncora no sistema atual — mantenha-o **idêntico** ao copiar, para os links do índice-mestre não quebrarem.
+A âncora de um cabeçalho markdown (estilo GitHub, usado pelo sistema) segue estas regras, **nesta ordem**:
+
+1. Converter todo o texto do cabeçalho (sem o `## ` inicial) para **minúsculas**.
+2. **Remover** toda a pontuação e símbolos — incluindo travessão `—`, dois-pontos `:`, parênteses. O emoji `⚠️` também é removido (não vira texto).
+3. Trocar cada **espaço** por um hífen `-`.
+
+Como o travessão `—` tem espaços dos dois lados (` — `), ao removê-lo sobram dois espaços que viram **dois hífens** `--`. É por isso que `## Sessão 01 — Turno 07` tem âncora `#sessão-01--turno-07` (hífen duplo), e **não** `#sessão-01-—-turno-07`.
+
+**Para eventos marcantes, a âncora cobre o cabeçalho inteiro.** `## Sessão 01 — Turno 07 ⚠️ EVENTO MARCANTE: o horror do rio` gera a âncora de todo esse texto. Isso é longo e frágil. Para evitar erro, prefira **copiar a âncora exatamente como ela já aparece no índice do arquivo original** — o sistema já gerou essa âncora corretamente ao criar a entrada; reaproveite-a em vez de recalcular.
+
+Exemplos:
+
+| Cabeçalho | Âncora correta | Erro comum a evitar |
+|---|---|---|
+| `## Sessão 01 — Turno 01` | `#sessão-01--turno-01` | `#sessão-01-—-turno-01` (manteve o `—`) |
+| `## Sessão 01 — Turno 07 ⚠️` | `#sessão-01--turno-07-` | manter o `⚠️` como caractere |
+
+- A regra de ouro: **reaproveite a âncora que já está no índice do arquivo-fonte** sempre que possível, em vez de recalcular do zero.
 - Links no índice-mestre são **relativos à pasta de partes** (`acontecimentos-parte-01.md#...`), pois o `indice.md` vive dentro dessa pasta.
 
 ---
