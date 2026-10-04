@@ -18,6 +18,7 @@ Registrar a perspectiva individual de cada personagem presente no turno em seus 
 1. **`str_replace` para o índice, `fs_append` para o corpo** — nunca `fs_write` em arquivos de memória
    - Inserir linha de índice: `str_replace` substituindo `\n\n---\n\n## ` (o separador antes do primeiro `## Sessão` do corpo) por `\n- [nova linha de índice]\n\n---\n\n## `
    - Adicionar corpo da entrada: `fs_append` ao final do arquivo
+   - ⚠️ **Caso de borda:** se ao ler o arquivo você encontrar um `---` entre o cabeçalho `## Índice` e as linhas de lista `- [`, ignore esse separador. O único ponto de inserção correto é o `---` que precede imediatamente o primeiro `## Sessão` do corpo. Nunca insira antes do primeiro `---` quando houver dois.
 2. **Perspectiva estrita** — cada registro reflete apenas o que aquele personagem vivenciou, sentiu e concluiu
 3. **Informação limitada ao acesso** — se o personagem não estava presente ou não tinha como saber, não registra
 4. **Mentiras e omissões** — registradas corretamente em cada perspectiva (ver seção abaixo)
